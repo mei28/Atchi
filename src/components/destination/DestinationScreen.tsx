@@ -49,6 +49,11 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
     setSelectedName(result.display_name.split(",").slice(0, 2).join(",").trim());
   }, []);
 
+  const handleResetDestination = useCallback(() => {
+    setSelectedPosition(null);
+    setSelectedName("");
+  }, []);
+
   const handleConfirm = useCallback(() => {
     if (!selectedPosition || !selectedName) return;
     onStart({ position: selectedPosition, name: selectedName });
@@ -88,6 +93,7 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
           <DestinationConfirm
             destination={{ position: selectedPosition!, name: selectedName }}
             onConfirm={handleConfirm}
+            onReset={handleResetDestination}
           />
         </div>
       )}

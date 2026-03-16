@@ -69,6 +69,28 @@ function FlyToPosition({ position }: { position: LatLng | null }) {
   return null;
 }
 
+/** 現在地へ飛ぶボタン */
+function FlyToUserButton({ userLocation }: { userLocation: LatLng | null }) {
+  const map = useMap();
+
+  if (!userLocation) return null;
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        map.flyTo([userLocation.lat, userLocation.lng], 16);
+      }}
+      className="absolute bottom-3 right-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md active:bg-gray-100"
+      aria-label="現在地へ移動"
+    >
+      <svg viewBox="0 0 24 24" className="h-5 w-5 text-blue" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="3 11 22 2 13 21 11 13 3 11" />
+      </svg>
+    </button>
+  );
+}
+
 type Props = {
   selectedPosition: LatLng | null;
   userLocation: LatLng | null;
@@ -139,6 +161,8 @@ export default function MapView({
           icon={markerIcon}
         />
       )}
+
+      <FlyToUserButton userLocation={userLocation} />
     </MapContainer>
   );
 }

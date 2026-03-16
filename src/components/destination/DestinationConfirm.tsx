@@ -5,9 +5,10 @@ import { shareDestination } from "../../lib/share";
 type Props = {
   destination: Destination;
   onConfirm: () => void;
+  onReset: () => void;
 };
 
-export default function DestinationConfirm({ destination, onConfirm }: Props) {
+export default function DestinationConfirm({ destination, onConfirm, onReset }: Props) {
   const handleShare = useCallback(() => {
     shareDestination(destination);
   }, [destination]);
@@ -18,6 +19,16 @@ export default function DestinationConfirm({ destination, onConfirm }: Props) {
         <p className="text-sm text-muted">目的地</p>
         <p className="truncate font-heading font-semibold text-ink">{destination.name}</p>
       </div>
+      <button
+        onClick={onReset}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors active:bg-ink/10"
+        aria-label="目的地をリセット"
+      >
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
       <button
         onClick={handleShare}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink transition-colors active:bg-ink/10"
