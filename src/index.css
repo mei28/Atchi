@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* カスタムテーマ */
+@theme {
+  --color-base: #FAFAF8;
+  --color-ink: #1A1A1A;
+  --color-coral: #FF6B4A;
+  --color-coral-glow: #FF8A6F;
+  --color-blue: #4A90D9;
+  --color-navy: #0D1B2A;
+  --color-navy-light: #1B2D45;
+  --color-muted: #9CA3AF;
+
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-mono: "Space Mono", monospace;
+}
+
+/* ベースリセット */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-base);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* Leaflet コンテナの高さ修正 */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* 到着アニメーション */
+@keyframes celebrate-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+@keyframes celebrate-ring {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.5); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.animate-celebrate-pulse {
+  animation: celebrate-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-celebrate-ring {
+  animation: celebrate-ring 2s ease-out infinite;
+}
+
+/* Safe area ユーティリティ */
+.pt-safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
