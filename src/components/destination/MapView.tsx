@@ -30,16 +30,21 @@ function MapClickHandler({ onClick }: { onClick: (latlng: LatLng) => void }) {
   return null;
 }
 
-/** マウント時に現在地へ移動 (位置情報が許可されている場合) */
-function InitialLocation({ userLocation }: { userLocation: LatLng | null }) {
+/** マウント時に初期位置へ移動（ピン優先、なければ現在地） */
+function InitialLocation({ selectedPosition, userLocation }: { selectedPosition: LatLng | null; userLocation: LatLng | null }) {
   const map = useMap();
   const didFly = useRef(false);
 
   useEffect(() => {
-    if (didFly.current || !userLocation) return;
-    didFly.current = true;
-    map.setView([userLocation.lat, userLocation.lng], 16);
-  }, [map, userLocation]);
+    if (didFly.current) return;
+    if (selectedPosition) {
+      didFly.current = true;
+      map.setView([selectedPosition.lat, selectedPosition.lng], 17);
+    } else if (userLocation) {
+      didFly.current = true;
+      map.setView([userLocation.lat, userLocation.lng], 16);
+    }
+  }, [map, selectedPosition, userLocation]);
 
   return null;
 }
@@ -96,7 +101,7 @@ export default function MapView({
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapClickHandler onClick={handleClick} />
-      <InitialLocation userLocation={userLocation} />
+      <InitialLocation selectedPosition={selectedPosition} userLocation={userLocation} />
       <FlyToPosition position={selectedPosition} />
 
       {/* 現在地: 精度圏 + 青ドット */}
