@@ -46,7 +46,7 @@ export default function NavigationScreen({ destination, onBack }: Props) {
     >
       <div className="flex h-full flex-col bg-base">
         <div className="pt-4">
-          <NavigationHeader destinationName={destination.name} onBack={onBack} />
+          <NavigationHeader destination={destination} onBack={onBack} />
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-8">

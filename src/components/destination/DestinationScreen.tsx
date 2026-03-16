@@ -8,19 +8,22 @@ import MapView from "./MapView";
 import DestinationConfirm from "./DestinationConfirm";
 
 type Props = {
+  initialDestination?: Destination | null;
   onStart: (destination: Destination) => void;
 };
 
-export default function DestinationScreen({ onStart }: Props) {
-  const [selectedPosition, setSelectedPosition] = useState<LatLng | null>(null);
-  const [selectedName, setSelectedName] = useState<string>("");
-  const [hasSearched, setHasSearched] = useState(false);
+export default function DestinationScreen({ initialDestination, onStart }: Props) {
+  const [selectedPosition, setSelectedPosition] = useState<LatLng | null>(
+    initialDestination?.position ?? null,
+  );
+  const [selectedName, setSelectedName] = useState<string>(
+    initialDestination?.name ?? "",
+  );
   const geo = useGeolocation();
   const search = useNominatimSearch();
 
   const handleSearch = useCallback(
     (query: string) => {
-      setHasSearched(true);
       search.search(query, geo.position);
     },
     [search, geo.position],
@@ -28,7 +31,6 @@ export default function DestinationScreen({ onStart }: Props) {
 
   const handleClear = useCallback(() => {
     search.clearResults();
-    setHasSearched(false);
   }, [search]);
 
   const handleMapClick = useCallback(async (latlng: LatLng) => {
@@ -61,19 +63,18 @@ export default function DestinationScreen({ onStart }: Props) {
         <p className="text-sm text-muted">どこへ行く?</p>
       </header>
 
-      <div className="px-5 pb-3">
+      <div className="relative z-10 px-5 pb-3">
         <SearchBar
           results={search.results}
           isLoading={search.isLoading}
           error={search.error}
-          hasSearched={hasSearched}
           onSearch={handleSearch}
           onSelect={handleSearchSelect}
           onClear={handleClear}
         />
       </div>
 
-      <div className="mx-5 flex-1 overflow-hidden rounded-2xl shadow-sm">
+      <div className="isolate mx-5 flex-1 overflow-hidden rounded-2xl shadow-sm">
         <MapView
           selectedPosition={selectedPosition}
           userLocation={geo.position}
@@ -85,7 +86,7 @@ export default function DestinationScreen({ onStart }: Props) {
       {selectedPosition && selectedName && selectedName !== "読み込み中..." && (
         <div className="px-5 pb-safe-bottom pt-3">
           <DestinationConfirm
-            name={selectedName}
+            destination={{ position: selectedPosition!, name: selectedName }}
             onConfirm={handleConfirm}
           />
         </div>
