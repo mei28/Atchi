@@ -1,21 +1,23 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { NominatimResult } from "../../types";
 
 type Props = {
   results: NominatimResult[];
   isLoading: boolean;
   error: string | null;
-  hasSearched: boolean;
   onSearch: (query: string) => void;
   onSelect: (result: NominatimResult) => void;
   onClear: () => void;
 };
 
+const DEBOUNCE_MS = 500;
+const MIN_QUERY_LENGTH = 2;
+
 /** display_name から見やすい名前と補足を分離する */
 function formatResult(result: NominatimResult): { name: string; detail: string } {
   const parts = result.display_name.split(",").map((s) => s.trim());
   const name = parts[0];
-  const detail = parts.slice(1, 4).join(", ");
+  const detail = parts.slice(1, 3).join(", ");
   return { name, detail };
 }
 
@@ -23,61 +25,93 @@ export default function SearchBar({
   results,
   isLoading,
   error,
-  hasSearched,
   onSearch,
   onSelect,
   onClear,
 }: Props) {
   const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    onSearch(query);
-  };
+  // デバウンス検索
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    const trimmed = query.trim();
+    if (trimmed.length < MIN_QUERY_LENGTH) {
+      onClear();
+      setIsOpen(false);
+      return;
+    }
+
+    timerRef.current = setTimeout(() => {
+      onSearch(trimmed);
+      setIsOpen(true);
+    }, DEBOUNCE_MS);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelect = (result: NominatimResult) => {
     const { name } = formatResult(result);
     setQuery(name);
+    setIsOpen(false);
     onSelect(result);
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    setIsOpen(false);
     onClear();
   };
 
-  const showDropdown = results.length > 0 || (hasSearched && !isLoading && results.length === 0);
+  const showDropdown = isOpen && (results.length > 0 || (isLoading === false && error == null && results.length === 0));
 
   return (
     <div className="relative">
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <div className="relative flex-1">
-          <svg
-            viewBox="0 0 24 24"
-            className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted"
-            fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="場所・施設名で検索"
-            className="w-full rounded-xl border-2 border-transparent bg-white/80 py-3 pl-10 pr-4 font-body text-ink shadow-sm outline-none transition-colors placeholder:text-muted focus:border-coral"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading || !query.trim()}
-          className="rounded-xl bg-coral px-5 py-3 font-heading font-semibold text-white shadow-sm transition-transform disabled:opacity-40 active:scale-95"
+      <div className="relative">
+        <svg
+          viewBox="0 0 24 24"
+          className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted"
+          fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
         >
-          {isLoading ? "..." : "検索"}
-        </button>
-      </form>
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="場所・施設名で検索"
+          className="w-full rounded-xl border-2 border-transparent bg-white/80 py-3 pl-10 pr-10 font-body text-ink shadow-sm outline-none transition-colors placeholder:text-muted focus:border-coral"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted transition-colors active:text-ink"
+          >
+            <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {isLoading && (
+        <div className="absolute left-0 right-0 z-50 mt-2 rounded-xl bg-white px-4 py-3 text-center text-sm text-muted shadow-lg">
+          検索中...
+        </div>
+      )}
 
       {error && (
         <p className="mt-2 text-sm text-coral">{error}</p>
       )}
 
-      {showDropdown && (
+      {showDropdown && !isLoading && (
         <ul className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-xl bg-white shadow-lg">
           {results.length > 0
             ? results.map((result) => {

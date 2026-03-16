@@ -14,6 +14,7 @@ export async function searchPlaces(
   url.searchParams.set("limit", "8");
   url.searchParams.set("accept-language", "ja");
   url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("dedupe", "0");
 
   // 現在地周辺にバイアスをかける (強制ではない)
   if (userLocation) {
@@ -26,7 +27,18 @@ export async function searchPlaces(
 
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error(`Nominatim search failed: ${res.status}`);
-  return res.json();
+  const results: NominatimResult[] = await res.json();
+
+  // 現在地がある場合、近い順にソート
+  if (userLocation) {
+    results.sort((a, b) => {
+      const dA = (parseFloat(a.lat) - userLocation.lat) ** 2 + (parseFloat(a.lon) - userLocation.lng) ** 2;
+      const dB = (parseFloat(b.lat) - userLocation.lat) ** 2 + (parseFloat(b.lon) - userLocation.lng) ** 2;
+      return dA - dB;
+    });
+  }
+
+  return results;
 }
 
 export async function reverseGeocode(position: LatLng): Promise<string> {
