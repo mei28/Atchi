@@ -35,7 +35,6 @@ export async function suggest(
   url.searchParams.set("access_token", MAPBOX_ACCESS_TOKEN);
   url.searchParams.set("session_token", sessionToken);
   url.searchParams.set("language", "ja");
-  url.searchParams.set("country", "JP");
   url.searchParams.set("limit", "8");
   url.searchParams.set(
     "types",
