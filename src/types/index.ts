@@ -18,12 +18,17 @@ export type GeolocationState = {
   error: GeolocationPositionError | null;
 };
 
-export type NominatimResult = {
-  place_id: number;
-  display_name: string;
-  lat: string;
-  lon: string;
-  type: string;
-  class: string;
-  addresstype?: string;
+/** 検索候補 (プロバイダー非依存) */
+export type SearchSuggestion = {
+  id: string;
+  name: string;
+  detail: string;
+};
+
+/** 検索結果 (位置確定済み) */
+export type SearchResult = {
+  id: string;
+  name: string;
+  detail: string;
+  position: LatLng;
 };
