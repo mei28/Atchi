@@ -19,3 +19,9 @@ export const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org";
 
 /** Nominatim リクエスト用 User-Agent */
 export const NOMINATIM_USER_AGENT = "Atchi/1.0";
+
+/** Mapbox Access Token */
+export const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+
+/** Mapbox Search Box API ベース URL */
+export const MAPBOX_SEARCH_BASE_URL = "https://api.mapbox.com/search/searchbox/v1";

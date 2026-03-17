@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import type { LatLng, Destination, NominatimResult } from "../../types";
+import type { LatLng, Destination, SearchSuggestion } from "../../types";
 import { reverseGeocode } from "../../lib/nominatim";
 import { useGeolocation } from "../../hooks/useGeolocation";
-import { useNominatimSearch } from "../../hooks/useNominatimSearch";
+import { usePlaceSearch } from "../../hooks/usePlaceSearch";
 import SearchBar from "./SearchBar";
 import MapView from "./MapView";
 import DestinationConfirm from "./DestinationConfirm";
@@ -20,18 +20,18 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
     initialDestination?.name ?? "",
   );
   const geo = useGeolocation();
-  const search = useNominatimSearch();
+  const placeSearch = usePlaceSearch();
 
   const handleSearch = useCallback(
     (query: string) => {
-      search.search(query, geo.position);
+      placeSearch.search(query, geo.position);
     },
-    [search, geo.position],
+    [placeSearch, geo.position],
   );
 
   const handleClear = useCallback(() => {
-    search.clearResults();
-  }, [search]);
+    placeSearch.clearSuggestions();
+  }, [placeSearch]);
 
   const handleMapClick = useCallback(async (latlng: LatLng) => {
     setSelectedPosition(latlng);
@@ -40,14 +40,15 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
     setSelectedName(name.split(",").slice(0, 2).join(",").trim());
   }, []);
 
-  const handleSearchSelect = useCallback((result: NominatimResult) => {
-    const position: LatLng = {
-      lat: parseFloat(result.lat),
-      lng: parseFloat(result.lon),
-    };
-    setSelectedPosition(position);
-    setSelectedName(result.display_name.split(",").slice(0, 2).join(",").trim());
-  }, []);
+  const handleSearchSelect = useCallback(
+    async (suggestion: SearchSuggestion) => {
+      setSelectedName("読み込み中...");
+      const result = await placeSearch.select(suggestion);
+      setSelectedPosition(result.position);
+      setSelectedName(result.name);
+    },
+    [placeSearch],
+  );
 
   const handleResetDestination = useCallback(() => {
     setSelectedPosition(null);
@@ -70,9 +71,9 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
 
       <div className="relative z-10 px-5 pb-3">
         <SearchBar
-          results={search.results}
-          isLoading={search.isLoading}
-          error={search.error}
+          suggestions={placeSearch.suggestions}
+          isLoading={placeSearch.isLoading}
+          error={placeSearch.error}
           onSearch={handleSearch}
           onSelect={handleSearchSelect}
           onClear={handleClear}
