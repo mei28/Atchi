@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { Destination } from "../../types";
 import { ARRIVAL_THRESHOLD_METERS } from "../../constants";
 import { useGeolocation } from "../../hooks/useGeolocation";
@@ -33,9 +34,9 @@ export default function NavigationScreen({ destination, onBack }: Props) {
       : null;
 
   const hasArrived = distance != null && distance <= ARRIVAL_THRESHOLD_METERS;
-
-  if (hasArrived) {
-    return <ArrivalCelebration onBack={onBack} />;
+  const arrivedRef = useRef(false);
+  if (hasArrived && !arrivedRef.current) {
+    arrivedRef.current = true;
   }
 
   return (
@@ -50,15 +51,19 @@ export default function NavigationScreen({ destination, onBack }: Props) {
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-8">
+          {arrivedRef.current && (
+            <ArrivalCelebration onBack={onBack} />
+          )}
+
           <CompassArrow rotation={rotation} heading={heading} />
           <DistanceDisplay meters={distance} />
 
-          {headingSource === "unavailable" && (
+          {!arrivedRef.current && headingSource === "unavailable" && (
             <p className="text-sm text-muted">
               歩くと方向がわかります
             </p>
           )}
-          {headingSource === "gps" && (
+          {!arrivedRef.current && headingSource === "gps" && (
             <p className="text-sm text-muted">
               GPS で方向を検出中
             </p>

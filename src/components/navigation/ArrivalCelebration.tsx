@@ -4,21 +4,18 @@ type Props = {
 
 export default function ArrivalCelebration({ onBack }: Props) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-8 bg-base px-8">
+    <div className="flex flex-col items-center gap-4">
       <div className="relative flex items-center justify-center">
-        <div className="animate-celebrate-ring absolute h-48 w-48 rounded-full border-4 border-coral" />
-        <div className="animate-celebrate-ring absolute h-48 w-48 rounded-full border-4 border-coral" style={{ animationDelay: "0.7s" }} />
-        <div className="animate-celebrate-pulse flex h-32 w-32 items-center justify-center rounded-full bg-coral">
-          <svg viewBox="0 0 24 24" className="h-16 w-16 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+        <div className="animate-celebrate-ring absolute h-24 w-24 rounded-full border-2 border-coral" />
+        <div className="animate-celebrate-ring absolute h-24 w-24 rounded-full border-2 border-coral" style={{ animationDelay: "0.7s" }} />
+        <div className="animate-celebrate-pulse flex h-16 w-16 items-center justify-center rounded-full bg-coral">
+          <svg viewBox="0 0 24 24" className="h-8 w-8 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </div>
       </div>
 
-      <div className="text-center">
-        <p className="font-heading text-3xl font-bold text-ink">到着!</p>
-        <p className="mt-2 text-muted">目的地に着きました</p>
-      </div>
+      <p className="font-heading text-xl font-bold text-ink">到着!</p>
 
       <button
         onClick={onBack}

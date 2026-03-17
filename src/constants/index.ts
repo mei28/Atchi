@@ -1,5 +1,5 @@
 /** 到着判定距離 (メートル) */
-export const ARRIVAL_THRESHOLD_METERS = 30;
+export const ARRIVAL_THRESHOLD_METERS = 20;
 
 /** GPS watchPosition のオプション */
 export const GEOLOCATION_OPTIONS: PositionOptions = {
