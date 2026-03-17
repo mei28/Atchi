@@ -8,11 +8,14 @@ export function buildShareURL(destination: Destination): string {
   return url.toString();
 }
 
-export async function shareDestination(destination: Destination): Promise<void> {
+export async function shareDestination(
+  destination: Destination,
+  shareText: string,
+): Promise<void> {
   const url = buildShareURL(destination);
   const shareData = {
     title: `Atchi - ${destination.name}`,
-    text: `「${destination.name}」へあっちへ行こう!`,
+    text: shareText,
     url,
   };
 

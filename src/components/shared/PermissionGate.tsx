@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useT } from "../../i18n/I18nProvider";
 
 type Props = {
   children: ReactNode;
@@ -13,6 +14,8 @@ export default function PermissionGate({
   needsOrientationPermission,
   onRequestOrientationPermission,
 }: Props) {
+  const t = useT();
+
   if (geoError) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-6 bg-base px-8 text-center">
@@ -24,10 +27,10 @@ export default function PermissionGate({
         </div>
         <div>
           <p className="font-heading text-xl font-semibold text-ink">
-            位置情報が必要です
+            {t("permission.locationTitle")}
           </p>
           <p className="mt-2 text-sm text-muted">
-            設定からこのサイトの位置情報アクセスを許可してください
+            {t("permission.locationDescription")}
           </p>
         </div>
       </div>
@@ -45,17 +48,17 @@ export default function PermissionGate({
         </div>
         <div>
           <p className="font-heading text-xl font-semibold text-ink">
-            コンパスを有効にする
+            {t("permission.compassTitle")}
           </p>
           <p className="mt-2 text-sm text-muted">
-            方向を示すためにデバイスのコンパスを使います
+            {t("permission.compassDescription")}
           </p>
         </div>
         <button
           onClick={onRequestOrientationPermission}
           className="rounded-full bg-coral px-8 py-3 font-heading font-semibold text-white transition-transform active:scale-95"
         >
-          許可する
+          {t("permission.allow")}
         </button>
       </div>
     );

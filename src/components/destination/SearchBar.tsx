@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import type { SearchSuggestion } from "../../types";
+import { useT } from "../../i18n/I18nProvider";
 
 type Props = {
   suggestions: SearchSuggestion[];
@@ -24,6 +25,7 @@ export default function SearchBar({
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const t = useT();
 
   // デバウンス検索
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function SearchBar({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="場所・施設名で検索"
+          placeholder={t("search.placeholder")}
           className="w-full rounded-xl border-2 border-transparent bg-white/80 py-3 pl-10 pr-10 font-body text-ink shadow-sm outline-none transition-colors placeholder:text-muted focus:border-coral"
         />
         {query && (
@@ -94,7 +96,7 @@ export default function SearchBar({
 
       {isLoading && (
         <div className="absolute left-0 right-0 z-50 mt-2 rounded-xl bg-white px-4 py-3 text-center text-sm text-muted shadow-lg">
-          検索中...
+          {t("search.loading")}
         </div>
       )}
 
@@ -128,7 +130,7 @@ export default function SearchBar({
               ))
             : (
               <li className="px-4 py-4 text-center text-sm text-muted">
-                該当する場所が見つかりませんでした
+                {t("search.noResults")}
               </li>
             )
           }

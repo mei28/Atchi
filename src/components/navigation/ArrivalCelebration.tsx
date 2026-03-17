@@ -1,8 +1,11 @@
+import { useT } from "../../i18n/I18nProvider";
+
 type Props = {
   onBack: () => void;
 };
 
 export default function ArrivalCelebration({ onBack }: Props) {
+  const t = useT();
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative flex items-center justify-center">
@@ -15,13 +18,13 @@ export default function ArrivalCelebration({ onBack }: Props) {
         </div>
       </div>
 
-      <p className="font-heading text-xl font-bold text-ink">到着!</p>
+      <p className="font-heading text-xl font-bold text-ink">{t("arrival.title")}</p>
 
       <button
         onClick={onBack}
         className="rounded-full bg-coral px-8 py-3 font-heading font-semibold text-white transition-transform active:scale-95"
       >
-        新しい目的地を探す
+        {t("arrival.newDestination")}
       </button>
     </div>
   );

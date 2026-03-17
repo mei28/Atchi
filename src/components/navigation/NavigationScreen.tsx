@@ -6,6 +6,7 @@ import { useDeviceOrientation } from "../../hooks/useDeviceOrientation";
 import { useHeading } from "../../hooks/useHeading";
 import { useBearing } from "../../hooks/useBearing";
 import { useDistance } from "../../hooks/useDistance";
+import { useT } from "../../i18n/I18nProvider";
 import PermissionGate from "../shared/PermissionGate";
 import NavigationHeader from "./NavigationHeader";
 import CompassArrow from "./CompassArrow";
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export default function NavigationScreen({ destination, onBack }: Props) {
+  const t = useT();
   const geo = useGeolocation();
   const orientation = useDeviceOrientation();
   const { heading, source: headingSource } = useHeading(
@@ -60,12 +62,12 @@ export default function NavigationScreen({ destination, onBack }: Props) {
 
           {!arrivedRef.current && headingSource === "unavailable" && (
             <p className="text-sm text-muted">
-              歩くと方向がわかります
+              {t("nav.hintWalk")}
             </p>
           )}
           {!arrivedRef.current && headingSource === "gps" && (
             <p className="text-sm text-muted">
-              GPS で方向を検出中
+              {t("nav.hintGps")}
             </p>
           )}
         </div>

@@ -29,12 +29,13 @@ export async function suggest(
   sessionToken: string,
   proximity?: LatLng | null,
   signal?: AbortSignal,
+  language: string = "ja",
 ): Promise<SearchSuggestion[]> {
   const url = new URL(`${MAPBOX_SEARCH_BASE_URL}/suggest`);
   url.searchParams.set("q", query);
   url.searchParams.set("access_token", MAPBOX_ACCESS_TOKEN);
   url.searchParams.set("session_token", sessionToken);
-  url.searchParams.set("language", "ja");
+  url.searchParams.set("language", language);
   url.searchParams.set("limit", "8");
   url.searchParams.set(
     "types",
@@ -60,11 +61,12 @@ export async function suggest(
 export async function retrieve(
   mapboxId: string,
   sessionToken: string,
+  language: string = "ja",
 ): Promise<SearchResult> {
   const url = new URL(`${MAPBOX_SEARCH_BASE_URL}/retrieve/${mapboxId}`);
   url.searchParams.set("access_token", MAPBOX_ACCESS_TOKEN);
   url.searchParams.set("session_token", sessionToken);
-  url.searchParams.set("language", "ja");
+  url.searchParams.set("language", language);
 
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error(`Mapbox retrieve failed: ${res.status}`);

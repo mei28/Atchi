@@ -3,9 +3,11 @@ import type { LatLng, Destination, SearchSuggestion } from "../../types";
 import { reverseGeocode } from "../../lib/nominatim";
 import { useGeolocation } from "../../hooks/useGeolocation";
 import { usePlaceSearch } from "../../hooks/usePlaceSearch";
+import { useI18n } from "../../i18n/I18nProvider";
 import SearchBar from "./SearchBar";
 import MapView from "./MapView";
 import DestinationConfirm from "./DestinationConfirm";
+import LanguageToggle from "../shared/LanguageToggle";
 
 type Props = {
   initialDestination?: Destination | null;
@@ -19,8 +21,10 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
   const [selectedName, setSelectedName] = useState<string>(
     initialDestination?.name ?? "",
   );
+  const [isLoadingName, setIsLoadingName] = useState(false);
   const geo = useGeolocation();
-  const placeSearch = usePlaceSearch();
+  const { locale, t } = useI18n();
+  const placeSearch = usePlaceSearch(locale);
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -35,17 +39,21 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
 
   const handleMapClick = useCallback(async (latlng: LatLng) => {
     setSelectedPosition(latlng);
-    setSelectedName("読み込み中...");
-    const name = await reverseGeocode(latlng);
-    setSelectedName(name.split(",").slice(0, 2).join(",").trim());
-  }, []);
+    setIsLoadingName(true);
+    const name = await reverseGeocode(latlng, locale);
+    setSelectedName(
+      name ? name.split(",").slice(0, 2).join(",").trim() : t("geo.unknownPlace"),
+    );
+    setIsLoadingName(false);
+  }, [locale, t]);
 
   const handleSearchSelect = useCallback(
     async (suggestion: SearchSuggestion) => {
-      setSelectedName("読み込み中...");
+      setIsLoadingName(true);
       const result = await placeSearch.select(suggestion);
       setSelectedPosition(result.position);
       setSelectedName(result.name);
+      setIsLoadingName(false);
     },
     [placeSearch],
   );
@@ -53,6 +61,7 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
   const handleResetDestination = useCallback(() => {
     setSelectedPosition(null);
     setSelectedName("");
+    setIsLoadingName(false);
   }, []);
 
   const handleConfirm = useCallback(() => {
@@ -63,10 +72,13 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
   return (
     <div className="flex h-full flex-col bg-base">
       <header className="px-5 pb-3 pt-safe-top">
-        <h1 className="pt-4 font-heading text-2xl font-bold text-ink">
-          Atchi
-        </h1>
-        <p className="text-sm text-muted">どこへ行く?</p>
+        <div className="flex items-center justify-between pt-4">
+          <h1 className="font-heading text-2xl font-bold text-ink">
+            Atchi
+          </h1>
+          <LanguageToggle />
+        </div>
+        <p className="text-sm text-muted">{t("destination.subtitle")}</p>
       </header>
 
       <div className="relative z-10 px-5 pb-3">
@@ -89,7 +101,7 @@ export default function DestinationScreen({ initialDestination, onStart }: Props
         />
       </div>
 
-      {selectedPosition && selectedName && selectedName !== "読み込み中..." && (
+      {selectedPosition && selectedName && !isLoadingName && (
         <div className="px-5 pb-safe-bottom pt-3">
           <DestinationConfirm
             destination={{ position: selectedPosition!, name: selectedName }}

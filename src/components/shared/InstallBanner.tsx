@@ -1,7 +1,9 @@
 import { useInstallPrompt } from "../../hooks/useInstallPrompt";
+import { useT } from "../../i18n/I18nProvider";
 
 export default function InstallBanner() {
   const { canInstall, isIOS, install, dismiss } = useInstallPrompt();
+  const t = useT();
 
   if (!canInstall) return null;
 
@@ -20,12 +22,12 @@ export default function InstallBanner() {
 
         <div className="min-w-0 flex-1">
           <p className="font-heading text-sm font-semibold text-ink">
-            ホーム画面に追加
+            {t("install.title")}
           </p>
           <p className="text-xs text-muted">
             {isIOS
-              ? "共有ボタン → 「ホーム画面に追加」"
-              : "すぐアクセスできるようになります"}
+              ? t("install.iosHint")
+              : t("install.androidHint")}
           </p>
         </div>
 
@@ -34,14 +36,14 @@ export default function InstallBanner() {
             onClick={install}
             className="shrink-0 rounded-full bg-coral px-4 py-1.5 font-heading text-sm font-semibold text-white transition-transform active:scale-95"
           >
-            追加
+            {t("install.add")}
           </button>
         )}
 
         <button
           onClick={dismiss}
           className="shrink-0 p-1 text-muted transition-colors hover:text-ink"
-          aria-label="閉じる"
+          aria-label={t("install.closeAriaLabel")}
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
             <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />

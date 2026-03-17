@@ -1,14 +1,17 @@
 import { formatDistance } from "../../lib/format";
+import { useT } from "../../i18n/I18nProvider";
 
 type Props = {
   meters: number | null;
 };
 
 export default function DistanceDisplay({ meters }: Props) {
+  const t = useT();
+
   if (meters == null) {
     return (
       <p className="font-mono text-2xl text-muted">
-        距離を計算中...
+        {t("distance.calculating")}
       </p>
     );
   }
