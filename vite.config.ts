@@ -63,6 +63,17 @@ export default defineConfig({
               },
             },
           },
+          {
+            urlPattern: /^https:\/\/api\.mapbox\.com\/search\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "mapbox-search",
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+              },
+            },
+          },
         ],
       },
     }),

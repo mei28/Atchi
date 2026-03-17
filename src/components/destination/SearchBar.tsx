@@ -1,28 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import type { NominatimResult } from "../../types";
+import type { SearchSuggestion } from "../../types";
 
 type Props = {
-  results: NominatimResult[];
+  suggestions: SearchSuggestion[];
   isLoading: boolean;
   error: string | null;
   onSearch: (query: string) => void;
-  onSelect: (result: NominatimResult) => void;
+  onSelect: (suggestion: SearchSuggestion) => void;
   onClear: () => void;
 };
 
-const DEBOUNCE_MS = 500;
+const DEBOUNCE_MS = 300;
 const MIN_QUERY_LENGTH = 2;
 
-/** display_name から見やすい名前と補足を分離する */
-function formatResult(result: NominatimResult): { name: string; detail: string } {
-  const parts = result.display_name.split(",").map((s) => s.trim());
-  const name = parts[0];
-  const detail = parts.slice(1, 3).join(", ");
-  return { name, detail };
-}
-
 export default function SearchBar({
-  results,
+  suggestions,
   isLoading,
   error,
   onSearch,
@@ -54,11 +46,10 @@ export default function SearchBar({
     };
   }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSelect = (result: NominatimResult) => {
-    const { name } = formatResult(result);
-    setQuery(name);
+  const handleSelect = (suggestion: SearchSuggestion) => {
+    setQuery(suggestion.name);
     setIsOpen(false);
-    onSelect(result);
+    onSelect(suggestion);
   };
 
   const handleClear = () => {
@@ -67,7 +58,7 @@ export default function SearchBar({
     onClear();
   };
 
-  const showDropdown = isOpen && (results.length > 0 || (isLoading === false && error == null && results.length === 0));
+  const showDropdown = isOpen && (suggestions.length > 0 || (isLoading === false && error == null && suggestions.length === 0));
 
   return (
     <div className="relative">
@@ -113,31 +104,28 @@ export default function SearchBar({
 
       {showDropdown && !isLoading && (
         <ul className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-xl bg-white shadow-lg">
-          {results.length > 0
-            ? results.map((result) => {
-                const { name, detail } = formatResult(result);
-                return (
-                  <li key={result.place_id}>
-                    <button
-                      onClick={() => handleSelect(result)}
-                      className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-base active:bg-base"
+          {suggestions.length > 0
+            ? suggestions.map((suggestion) => (
+                <li key={suggestion.id}>
+                  <button
+                    onClick={() => handleSelect(suggestion)}
+                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-base active:bg-base"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="mt-0.5 h-4.5 w-4.5 shrink-0 text-coral"
+                      fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
                     >
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="mt-0.5 h-4.5 w-4.5 shrink-0 text-coral"
-                        fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-ink">{name}</p>
-                        <p className="truncate text-xs text-muted">{detail}</p>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-ink">{suggestion.name}</p>
+                      <p className="truncate text-xs text-muted">{suggestion.detail}</p>
+                    </div>
+                  </button>
+                </li>
+              ))
             : (
               <li className="px-4 py-4 text-center text-sm text-muted">
                 該当する場所が見つかりませんでした
