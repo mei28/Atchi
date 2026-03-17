@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import type { Screen, Destination } from "./types";
 import { useDestination } from "./hooks/useDestination";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
+import InstallBanner from "./components/shared/InstallBanner";
 import DestinationScreen from "./components/destination/DestinationScreen";
 import NavigationScreen from "./components/navigation/NavigationScreen";
 
@@ -56,6 +57,7 @@ export default function App() {
           <NavigationScreen destination={destination} onBack={handleBack} />
         )}
       </div>
+      <InstallBanner />
     </ErrorBoundary>
   );
 }
