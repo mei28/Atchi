@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Screen, Destination } from "./types";
 import { useDestination } from "./hooks/useDestination";
+import { useT } from "./i18n/I18nProvider";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import InstallBanner from "./components/shared/InstallBanner";
 import DestinationScreen from "./components/destination/DestinationScreen";
 import NavigationScreen from "./components/navigation/NavigationScreen";
 
 /** URL パラメータから目的地を読み取る */
-function parseDestinationFromURL(): Destination | null {
+function parseDestinationFromURL(fallbackName: string): Destination | null {
   const params = new URLSearchParams(window.location.search);
   const lat = params.get("lat");
   const lng = params.get("lng");
@@ -18,17 +19,18 @@ function parseDestinationFromURL(): Destination | null {
   if (!isFinite(latN) || !isFinite(lngN)) return null;
   return {
     position: { lat: latN, lng: lngN },
-    name: name || "共有された目的地",
+    name: name || fallbackName,
   };
 }
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("destination");
   const { destination, setDestination } = useDestination();
+  const t = useT();
 
   // URL パラメータから目的地を復元（地図画面で確認してから開始）
   useEffect(() => {
-    const dest = parseDestinationFromURL();
+    const dest = parseDestinationFromURL(t("app.sharedDestination"));
     if (dest) {
       setDestination(dest);
       window.history.replaceState({}, "", window.location.pathname);

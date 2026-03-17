@@ -1,4 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from "react";
+import { useT } from "../../i18n/I18nProvider";
 
 type Props = {
   children: ReactNode;
@@ -7,6 +8,31 @@ type Props = {
 type State = {
   error: Error | null;
 };
+
+function ErrorFallback({
+  error,
+  onReset,
+}: {
+  error: Error;
+  onReset: () => void;
+}) {
+  const t = useT();
+
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-4 bg-base px-8 text-center">
+      <p className="font-heading text-xl font-semibold text-ink">
+        {t("error.title")}
+      </p>
+      <p className="text-sm text-muted">{error.message}</p>
+      <button
+        onClick={onReset}
+        className="rounded-xl bg-coral px-6 py-2 font-heading font-semibold text-white"
+      >
+        {t("error.retry")}
+      </button>
+    </div>
+  );
+}
 
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { error: null };
@@ -22,18 +48,10 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.error) {
       return (
-        <div className="flex h-full flex-col items-center justify-center gap-4 bg-base px-8 text-center">
-          <p className="font-heading text-xl font-semibold text-ink">
-            エラーが発生しました
-          </p>
-          <p className="text-sm text-muted">{this.state.error.message}</p>
-          <button
-            onClick={() => this.setState({ error: null })}
-            className="rounded-xl bg-coral px-6 py-2 font-heading font-semibold text-white"
-          >
-            やり直す
-          </button>
-        </div>
+        <ErrorFallback
+          error={this.state.error}
+          onReset={() => this.setState({ error: null })}
+        />
       );
     }
     return this.props.children;

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import type { LatLng, SearchSuggestion, SearchResult } from "../types";
+import type { Locale } from "../i18n/types";
 import { suggest, retrieve } from "../lib/mapbox";
 
 type State = {
@@ -8,7 +9,7 @@ type State = {
   error: string | null;
 };
 
-export function usePlaceSearch() {
+export function usePlaceSearch(locale: Locale) {
   const [state, setState] = useState<State>({
     suggestions: [],
     isLoading: false,
@@ -36,6 +37,7 @@ export function usePlaceSearch() {
           sessionTokenRef.current,
           userLocation,
           controller.signal,
+          locale,
         );
         setState({ suggestions, isLoading: false, error: null });
       } catch (e) {
@@ -43,11 +45,11 @@ export function usePlaceSearch() {
         setState({
           suggestions: [],
           isLoading: false,
-          error: e instanceof Error ? e.message : "検索に失敗しました",
+          error: e instanceof Error ? e.message : null,
         });
       }
     },
-    [],
+    [locale],
   );
 
   const select = useCallback(
@@ -55,12 +57,13 @@ export function usePlaceSearch() {
       const result = await retrieve(
         suggestion.id,
         sessionTokenRef.current,
+        locale,
       );
       // セッション完了 → トークンリセット
       sessionTokenRef.current = crypto.randomUUID();
       return result;
     },
-    [],
+    [locale],
   );
 
   const clearSuggestions = useCallback(() => {
