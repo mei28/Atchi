@@ -58,6 +58,16 @@ body {
   animation: celebrate-ring 2s ease-out infinite;
 }
 
+/* インストールバナー スライドインアニメーション */
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
 /* Safe area ユーティリティ */
 .pt-safe-top {
   padding-top: env(safe-area-inset-top, 0px);
