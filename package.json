@@ -19,6 +19,7 @@
     "@types/leaflet": "^1.9.12",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vite-pwa/assets-generator": "^1.0.2",
     "@vitejs/plugin-react-swc": "^4.0.0",
     "tailwindcss": "^4.0.0",
     "typescript": "~5.9.3",
@@ -28,7 +29,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
-      "@swc/core"
+      "@swc/core",
+      "sharp"
     ]
   }
 }
